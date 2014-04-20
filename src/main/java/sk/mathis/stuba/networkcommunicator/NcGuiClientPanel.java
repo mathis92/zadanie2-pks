@@ -5,8 +5,11 @@
  */
 package sk.mathis.stuba.networkcommunicator;
 
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFormattedTextField;
+import javax.swing.JTextArea;
 
 /**
  *
@@ -19,6 +22,8 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
     public NcGuiClientPanel(NcGui gui) {
         this.gui = gui;
         initComponents();
+        packetSize.setModel(new DefaultComboBoxModel(new String[]{"32","64", "128","256","512"}));
+        packetSize.setSelectedIndex(0);
     }
 
     /**
@@ -35,6 +40,9 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
         sendTextField = new javax.swing.JFormattedTextField();
         packetSize = new javax.swing.JComboBox();
         sendButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        fragmentCount = new javax.swing.JLabel();
 
         setMaximumSize(new java.awt.Dimension(360, 390));
         setMinimumSize(new java.awt.Dimension(360, 390));
@@ -51,6 +59,12 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
 
         sendButton.setText("Send");
 
+        jLabel1.setText("Fragment Size");
+
+        jLabel2.setText("Actual fragment count");
+
+        fragmentCount.setText("jLabel3");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -59,9 +73,18 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
             .addComponent(sendTextField)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(packetSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(sendButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addGap(31, 31, 31)
+                        .addComponent(packetSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(sendButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(fragmentCount)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -73,8 +96,13 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(packetSize, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(sendButton))
-                .addGap(0, 46, Short.MAX_VALUE))
+                    .addComponent(sendButton)
+                    .addComponent(jLabel1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2)
+                    .addComponent(fragmentCount))
+                .addGap(0, 26, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -86,9 +114,24 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
         return sendButton;
     }
 
+    public NcGui getGui() {
+        return gui;
+    }
+
+    public JTextArea getCommunicationArea() {
+        return communicationArea;
+    }
+
+    public JComboBox getPacketSize() {
+        return packetSize;
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea communicationArea;
+    private javax.swing.JLabel fragmentCount;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JComboBox packetSize;
     private javax.swing.JButton sendButton;

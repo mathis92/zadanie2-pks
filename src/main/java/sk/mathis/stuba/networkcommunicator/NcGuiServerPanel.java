@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package sk.mathis.stuba.networkcommunicator;
+
+import javax.swing.JTextArea;
 
 /**
  *
@@ -13,6 +14,7 @@ package sk.mathis.stuba.networkcommunicator;
 public class NcGuiServerPanel extends javax.swing.JPanel {
 
     NcGui gui;
+
     public NcGuiServerPanel(NcGui gui) {
         this.gui = gui;
         initComponents();
@@ -49,6 +51,14 @@ public class NcGuiServerPanel extends javax.swing.JPanel {
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 401, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
+
+    public NcGui getGui() {
+        return gui;
+    }
+
+    public JTextArea getCommunicationArea() {
+        return communicationArea;
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

@@ -2,6 +2,11 @@ package sk.mathis.stuba.networkcommunicator;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JFormattedTextField;
+import javax.swing.JOptionPane;
+import javax.swing.JTextArea;
+import sk.mathis.stuba.equip.DataHelpers;
 import sk.mathis.stuba.networkcommunicator.guicontroller.NcGuiController;
 import sk.mathis.stuba.networkcommunicator.guicontroller.NcGuiServerPanelController;
 
@@ -24,6 +29,9 @@ public class NcGui extends javax.swing.JFrame {
         controller = new NcGuiController(this);
         initComponents();
         fillComboBoxes();
+        updateComboBoxes();
+        myIpAddress.setText(DataHelpers.getMyIpAddress());
+        this.setTitle("Network Communicator");
 
     }
 
@@ -38,7 +46,7 @@ public class NcGui extends javax.swing.JFrame {
 
         jDialog1 = new javax.swing.JDialog();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextArea1 = new javax.swing.JTextArea();
+        logArea = new javax.swing.JTextArea();
         showLog = new javax.swing.JButton();
         interfaceType = new javax.swing.JComboBox();
         jLabel1 = new javax.swing.JLabel();
@@ -46,14 +54,18 @@ public class NcGui extends javax.swing.JFrame {
         destinationIpAddress = new javax.swing.JFormattedTextField();
         jLabel3 = new javax.swing.JLabel();
         myIpAddress = new javax.swing.JLabel();
-        chooseButton = new javax.swing.JButton();
+        startButton = new javax.swing.JButton();
         jTabbedPane1 = new javax.swing.JTabbedPane();
+        jButton1 = new javax.swing.JButton();
+        jLabel4 = new javax.swing.JLabel();
+        communicationPort = new javax.swing.JFormattedTextField();
+        stopButton = new javax.swing.JButton();
 
         jDialog1.setMinimumSize(new java.awt.Dimension(700, 500));
 
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
+        logArea.setColumns(20);
+        logArea.setRows(5);
+        jScrollPane1.setViewportView(logArea);
 
         javax.swing.GroupLayout jDialog1Layout = new javax.swing.GroupLayout(jDialog1.getContentPane());
         jDialog1.getContentPane().setLayout(jDialog1Layout);
@@ -87,19 +99,50 @@ public class NcGui extends javax.swing.JFrame {
         jLabel1.setText("Interface type : ");
 
         jLabel2.setText("Destination ip address : ");
+        jLabel2.setEnabled(false);
 
-        destinationIpAddress.setText("jFormattedTextField1");
+        destinationIpAddress.setText("fill dest IP address");
+        destinationIpAddress.setEnabled(false);
+        destinationIpAddress.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                destinationIpAddressFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                destinationIpAddressFocusLost(evt);
+            }
+        });
 
         jLabel3.setText("My ip address");
 
         myIpAddress.setText("jLabel4");
 
-        chooseButton.setText("Choose");
-        chooseButton.addActionListener(new java.awt.event.ActionListener() {
+        startButton.setText("Start");
+        startButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                chooseButtonActionPerformed(evt);
+                startButtonActionPerformed(evt);
             }
         });
+
+        jButton1.setText("Select");
+
+        jLabel4.setText("Communication Port :");
+
+        communicationPort.setText("9876");
+        communicationPort.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                communicationPortFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                communicationPortFocusLost(evt);
+            }
+        });
+        communicationPort.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                communicationPortActionPerformed(evt);
+            }
+        });
+
+        stopButton.setText("Stop");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -111,22 +154,34 @@ public class NcGui extends javax.swing.JFrame {
                     .addComponent(jTabbedPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jLabel1)
-                            .addComponent(jLabel3))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel1)
+                                    .addComponent(jLabel3))
+                                .addGap(66, 66, 66)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(myIpAddress)
+                                    .addComponent(interfaceType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel4)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 23, Short.MAX_VALUE)
+                                .addComponent(communicationPort, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 0, Short.MAX_VALUE)))
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(showLog, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(myIpAddress)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(showLog))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(destinationIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(interfaceType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 133, Short.MAX_VALUE)
-                                .addComponent(chooseButton)))))
+                                .addGap(43, 43, 43)
+                                .addComponent(jButton1))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(startButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(stopButton))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addComponent(destinationIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -134,20 +189,26 @@ public class NcGui extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(13, 13, 13)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(myIpAddress)
+                    .addComponent(showLog))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(interfaceType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(chooseButton))
+                    .addComponent(startButton)
+                    .addComponent(stopButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(destinationIpAddress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(myIpAddress)
-                    .addComponent(showLog))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE)
+                    .addComponent(jLabel4)
+                    .addComponent(communicationPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 19, Short.MAX_VALUE)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -155,7 +216,7 @@ public class NcGui extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void interfaceTypeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_interfaceTypeActionPerformed
-        // TODO add your handling code here:
+        updateComboBoxes();
     }//GEN-LAST:event_interfaceTypeActionPerformed
 
     private void showLogActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_showLogActionPerformed
@@ -163,16 +224,44 @@ public class NcGui extends javax.swing.JFrame {
         jDialog1.setLocationRelativeTo(null);
     }//GEN-LAST:event_showLogActionPerformed
 
-    private void chooseButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chooseButtonActionPerformed
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         if (interfaceType.getSelectedIndex() == 0) {
+            destinationIpAddress.setText("n/a");
             server = new NcGuiServerPanel(this);
             jTabbedPane1.addTab("Server", server);
+            controller.start();
         } else {
-            client = new NcGuiClientPanel(this);
-            jTabbedPane1.addTab("Client", client);
+            if (!destinationIpAddress.getText().matches(".*\\d.*")) {
+                JOptionPane.showMessageDialog(this, "You have to fill destination IP address!", "Notification !!!!", JOptionPane.WARNING_MESSAGE);
+            } else if (!communicationPort.getText().matches(".*\\d.*")) {
+                JOptionPane.showMessageDialog(this, "You have to fill Communication port!", "Notification !!!!", JOptionPane.WARNING_MESSAGE);
+            } else {
+                client = new NcGuiClientPanel(this);
+                jTabbedPane1.addTab("Client", client);
+                controller.start();
+            }
         }
-        controller.start();
-    }//GEN-LAST:event_chooseButtonActionPerformed
+
+    }//GEN-LAST:event_startButtonActionPerformed
+
+    private void destinationIpAddressFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_destinationIpAddressFocusGained
+
+    }//GEN-LAST:event_destinationIpAddressFocusGained
+
+    private void destinationIpAddressFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_destinationIpAddressFocusLost
+
+    }//GEN-LAST:event_destinationIpAddressFocusLost
+
+    private void communicationPortFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_communicationPortFocusGained
+    }//GEN-LAST:event_communicationPortFocusGained
+
+    private void communicationPortFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_communicationPortFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_communicationPortFocusLost
+
+    private void communicationPortActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_communicationPortActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_communicationPortActionPerformed
 
     /**
      * @param args the command line arguments
@@ -213,6 +302,16 @@ public class NcGui extends javax.swing.JFrame {
         interfaceType.setModel(new DefaultComboBoxModel(new String[]{"Server", "Client"}));
     }
 
+    public void updateComboBoxes() {
+        if (interfaceType.getSelectedIndex() == 1) {
+            destinationIpAddress.setEnabled(true);
+            jLabel2.setEnabled(true);
+        }else { 
+            destinationIpAddress.setEnabled(false);
+            jLabel2.setEnabled(false);
+        }
+    }
+
     public NcGuiClientPanel getClient() {
         return client;
     }
@@ -221,19 +320,43 @@ public class NcGui extends javax.swing.JFrame {
         return server;
     }
 
+    public JFormattedTextField getDestinationIpAddress() {
+        return destinationIpAddress;
+    }
+
+    public JButton getStartButton() {
+        return startButton;
+    }
+
+    public JButton getStopButton() {
+        return stopButton;
+    }
+
+    public JFormattedTextField getCommunicationPort() {
+        return communicationPort;
+    }
+
+    public JTextArea getLogArea() {
+        return logArea;
+    }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton chooseButton;
+    private javax.swing.JFormattedTextField communicationPort;
     private javax.swing.JFormattedTextField destinationIpAddress;
     private javax.swing.JComboBox interfaceType;
+    private javax.swing.JButton jButton1;
     private javax.swing.JDialog jDialog1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTabbedPane jTabbedPane1;
-    private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTextArea logArea;
     private javax.swing.JLabel myIpAddress;
     private javax.swing.JButton showLog;
+    private javax.swing.JButton startButton;
+    private javax.swing.JButton stopButton;
     // End of variables declaration//GEN-END:variables
 }
