@@ -37,6 +37,7 @@ public class NcGuiServerPanel extends javax.swing.JPanel {
         setPreferredSize(new java.awt.Dimension(380, 401));
 
         communicationArea.setColumns(20);
+        communicationArea.setLineWrap(true);
         communicationArea.setRows(5);
         jScrollPane1.setViewportView(communicationArea);
 

@@ -21,7 +21,7 @@ public class IncommingCommunication {
         this.ipAddress = IpAddress;
         incPacketList = new ArrayList<>();
         incPacketList.add(incPacket);
-        state = 0;
+        
     }
 
     public String getIpAddress() {

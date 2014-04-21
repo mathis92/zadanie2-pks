@@ -11,14 +11,16 @@ package sk.mathis.stuba.equip;
  */
 public class OutgoingPacket {
 
-    private Integer packetCount;
-    private Integer packetNum;
-    private Integer packetSize;
-    private byte[] data;
-    private byte[] outgoingPacket;
-    private Integer sentenceLength;
-    private byte[] type;
-    public OutgoingPacket(Integer packetCount, Integer PacketNum, Integer packetSize, Integer sentenceLength,byte[] type, byte[] data) {
+    private final Integer packetCount;
+    private final Integer packetNum;
+    private final Integer packetSize;
+    private final byte[] data;
+    private final byte[] outgoingPacket;
+    private final Integer sentenceLength;
+    private final byte[] type;
+    private final Integer nameLength;
+
+    public OutgoingPacket(Integer packetCount, Integer PacketNum, Integer packetSize, Integer sentenceLength, byte[] type, Integer nameLength, byte[] data) {
         this.packetCount = packetCount;
         this.packetNum = PacketNum;
         this.packetSize = packetSize;
@@ -26,17 +28,21 @@ public class OutgoingPacket {
         outgoingPacket = new byte[packetSize];
         this.sentenceLength = sentenceLength;
         this.type = type;
+        this.nameLength = nameLength;
         formOutgoingPacket();
     }
 
     private void formOutgoingPacket() {
-        System.out.println(" packetCount " + packetCount + " packetNum " + packetNum + " packetSize "  + packetSize);
+        System.out.println(" packetCount " + packetCount + " packetNum " + packetNum + " packetSize " + packetSize);
         System.arraycopy(DataHelpers.intToByte(packetCount), 0, outgoingPacket, 0, 4);
         System.arraycopy(DataHelpers.intToByte(packetNum), 0, outgoingPacket, 4, 4);
         System.arraycopy(DataHelpers.intToByte(packetSize), 0, outgoingPacket, 8, 4);
-        System.arraycopy(DataHelpers.intToByte(sentenceLength),0,outgoingPacket,12,4);
+        System.arraycopy(DataHelpers.intToByte(sentenceLength), 0, outgoingPacket, 12, 4);
         System.arraycopy(type, 0, outgoingPacket, 16, 1);
-        System.arraycopy(data, 0, outgoingPacket, 17, sentenceLength);
+        System.out.println("type out " + type[0]);
+        System.arraycopy(DataHelpers.intToByte(nameLength), 0, outgoingPacket, 17, 4);
+        System.arraycopy(data, 0, outgoingPacket, (21), sentenceLength + nameLength);
+
     }
 
     public byte[] getOutgoingPacket() {

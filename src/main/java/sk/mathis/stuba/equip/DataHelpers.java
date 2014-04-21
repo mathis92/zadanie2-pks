@@ -55,9 +55,11 @@ public class DataHelpers {
 
     }
 
-    public static String bToString(byte singleByte) {
+    public static String byteArrayToString(byte[] byteArray) {
         StringBuilder newString = new StringBuilder();
-        newString.append(String.format("%02X ", singleByte));
+        for(byte b :byteArray){
+        newString.append(b);
+        }
         return newString.toString();
     }
 }

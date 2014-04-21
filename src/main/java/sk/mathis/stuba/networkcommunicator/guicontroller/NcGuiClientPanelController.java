@@ -18,6 +18,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sk.mathis.stuba.equip.DataHelpers;
+import sk.mathis.stuba.equip.FragmentCounter;
 import sk.mathis.stuba.equip.OutgoingPacket;
 import sk.mathis.stuba.networkcommunicator.NcGuiClientPanel;
 
@@ -28,9 +30,12 @@ import sk.mathis.stuba.networkcommunicator.NcGuiClientPanel;
 public class NcGuiClientPanelController implements Runnable {
 
     NcGuiClientPanel guiPanel;
+    Integer nameSent = 0;
 
     public NcGuiClientPanelController(NcGuiClientPanel guiPanel) {
         this.guiPanel = guiPanel;
+        FragmentCounter fc = new FragmentCounter(guiPanel);
+        new Thread(fc).start();
     }
 
     @Override
@@ -41,10 +46,8 @@ public class NcGuiClientPanelController implements Runnable {
             public void actionPerformed(ActionEvent e) {
                 try (DatagramSocket clientSocket = new DatagramSocket()) {
                     final InetAddress IPAddress = InetAddress.getByName(guiPanel.getGui().getDestinationIpAddress().getText());
-                    byte[] dataToBeSend = null;// = new byte[1024];
                     final String sentence = guiPanel.getSendTextField().getText();
-                    dataToBeSend = sentence.getBytes();
-
+                    
                     for (OutgoingPacket outPacket : splitSentence(sentence)) {
 
                         final DatagramPacket outgoingPacket = new DatagramPacket(outPacket.getOutgoingPacket(), outPacket.getOutgoingPacket().length, IPAddress, Integer.parseInt(guiPanel.getGui().getCommunicationPort().getText()));
@@ -64,6 +67,8 @@ public class NcGuiClientPanelController implements Runnable {
 
                 } catch (SocketException | UnknownHostException ex) {
                     Logger.getLogger(NcGuiClientPanelController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (IOException ex) {
+                    Logger.getLogger(NcGuiClientPanelController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -78,28 +83,37 @@ public class NcGuiClientPanelController implements Runnable {
         Integer packetNum = 0;
         Integer packetSize = 0;
         Integer dataLength = 0;
-        byte type[] = null;
+        byte[] name = guiPanel.getNameField().getText().getBytes();
+        byte type[] = new byte[1];
         Integer sentenceLength = sentence.getBytes().length;
         byte[] data = sentence.getBytes();
 
         packetSize = Integer.parseInt((String) guiPanel.getPacketSize().getSelectedItem());
-        dataLength = packetSize - 17;
+        dataLength = packetSize - (21 + name.length);
 
         packetCount = (int) Math.ceil((double) sentence.getBytes().length / dataLength);
+        System.out.println("sentence length " + sentence.getBytes().length + " data length " + dataLength + " packetCount " + packetCount);
         for (int i = 0; i < packetCount; i++) {
-            if(i == 0){
+            if (packetCount == 1) {
+                type[0] = 0x01;
+            } else if (i == 0) {
                 type[0] = 0x00;
-            } else if (i == packetCount -1){
+            } else if (i == (packetCount - 1)) {
+                System.out.println((packetCount - 1) + " = " + i);
                 type[0] = 0x01;
             } else {
                 type[0] = 0x02;
             }
-            byte[] tempData = new byte[dataLength];
+            System.out.println(type[0]);
+            byte[] tempData = new byte[dataLength + name.length];
             System.out.println(data);
             System.out.println("packetSize*packetNum:" + packetSize * packetNum + "    " + sentenceLength);
             System.out.println("packet count " + packetCount);
-            System.arraycopy(data, dataLength * packetNum, tempData, 0, ((sentenceLength > dataLength) ? dataLength : sentenceLength));
-            packetList.add(new OutgoingPacket(packetCount, packetNum, packetSize, ((sentenceLength > dataLength) ? dataLength : sentenceLength),type, tempData));
+            System.arraycopy(name, 0, tempData, 0, name.length);
+            System.arraycopy(data, (dataLength * packetNum), tempData, name.length, ((sentenceLength > dataLength) ? dataLength : sentenceLength));
+           
+            System.out.println("data " + data + " dataLength * packetNum " + dataLength * packetNum + ", tempData" + tempData + ", ((sentenceLength > dataLength) ? dataLength : sentenceLength)" + ((sentenceLength > dataLength) ? dataLength : sentenceLength));
+            packetList.add(new OutgoingPacket(packetCount, packetNum, packetSize, ((sentenceLength > dataLength) ? dataLength : sentenceLength), type, name.length, tempData));
             packetNum++;
             sentenceLength -= dataLength;
         }

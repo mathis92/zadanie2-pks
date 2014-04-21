@@ -6,6 +6,10 @@
 
 package sk.mathis.stuba.equip;
 
+import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Mathis
@@ -18,6 +22,8 @@ public class IncommingPacket implements Comparable<IncommingPacket>{
     private Integer dataLength;
     private Integer type;
     private final byte[] receivedData;
+    private Integer nameLength;
+    private byte[] name;
 
     public IncommingPacket(byte[] receivedData) {
 
@@ -42,14 +48,31 @@ public class IncommingPacket implements Comparable<IncommingPacket>{
         System.out.println(" packet Count " + packetCount + " packet num " + packetNum + " packet size " + packetSize + " data length " + dataLength);
         byte[] typeByte = new byte[1];
         System.arraycopy(receivedData, 16, typeByte, 0, 1);
-        type = DataHelpers.toInt(typeByte);
-        
-        data = new byte[packetSize - 16];
-        System.arraycopy(receivedData, 16, data, 0, dataLength);
+        type = DataHelpers.singleToInt(typeByte[0]);
+        byte[] nameLengthByte = new byte[4];
+        System.arraycopy(receivedData, 17, nameLengthByte, 0, 4);
+        nameLength = DataHelpers.toInt(nameLengthByte);
+        name = new byte[nameLength];
+        System.arraycopy(receivedData, 21, name, 0, nameLength);
+         try {
+             System.out.println(new String(name,"UTF-8"));
+         } catch (UnsupportedEncodingException ex) {
+             Logger.getLogger(IncommingPacket.class.getName()).log(Level.SEVERE, null, ex);
+         }
+        data = new byte[packetSize - (21+nameLength) ];
+        System.arraycopy(receivedData,(21+nameLength) , data, 0, dataLength);
    }    
 
     public byte[] getData() {
         return data;
+    }
+
+    public Integer getNameLength() {
+        return nameLength;
+    }
+
+    public byte[] getName() {
+        return name;
     }
 
     public Integer getType() {
