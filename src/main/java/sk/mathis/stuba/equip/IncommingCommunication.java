@@ -16,13 +16,13 @@ public class IncommingCommunication {
 
     private ArrayList<IncommingPacket> incPacketList;
     private final String ipAddress;
+    private Integer receivedPacketCount;
     private Integer state;
 
     public IncommingCommunication(String IpAddress, IncommingPacket incPacket) {
         this.ipAddress = IpAddress;
         incPacketList = new ArrayList<>();
         incPacketList.add(incPacket);
-
     }
 
     public String getIpAddress() {
@@ -40,5 +40,18 @@ public class IncommingCommunication {
     public Integer getState() {
         return state;
     }
+
+    public void setIncPacketList(ArrayList<IncommingPacket> incPacketList) {
+        this.incPacketList = incPacketList;
+    }
+
+    public void setReceivedPacketCount() {
+        this.receivedPacketCount = incPacketList.size();
+    }
+
+    public Integer getReceivedPacketCount() {
+        return receivedPacketCount;
+    }
+    
 
 }

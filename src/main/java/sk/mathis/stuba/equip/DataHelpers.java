@@ -21,8 +21,8 @@ public class DataHelpers {
             InetAddress addr = InetAddress.getLocalHost();
             String hostname = addr.getHostName();
             ipAddress = addr.getHostAddress();
-            System.out.println(addr.getHostAddress());
-            System.out.println(hostname);
+        //    System.out.println(addr.getHostAddress());
+         //   System.out.println(hostname);
         } catch (UnknownHostException e) {
 
         }

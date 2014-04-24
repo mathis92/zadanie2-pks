@@ -59,13 +59,14 @@ public class NcGuiClientPanelController implements Runnable {
 
                         try {
                             clientSocket.send(outgoingPacket);
-                            lf.fillLog(outPacket);
+                            lf.fillOutLog(outPacket);
                         } catch (IOException ex) {
                             Logger.getLogger(NcGuiClientPanelController.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (InterruptedException ex) {
                             Logger.getLogger(NcGuiClientPanelController.class.getName()).log(Level.SEVERE, null, ex);
                         }
                     }
+                    guiPanel.getGui().getLogArea().append("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
 
                     clientSocket.close();
 
@@ -90,7 +91,7 @@ public class NcGuiClientPanelController implements Runnable {
         Integer sentenceLength = sentence.getBytes().length;
         byte[] data = sentence.getBytes();
 
-        packetSize = Integer.parseInt((String) guiPanel.getPacketSize().getSelectedItem());
+        packetSize = 21+name.length + (Integer)guiPanel.getPacketSize().getValue();
         dataLength = packetSize - (21 + name.length);
 
         packetCount = (int) Math.ceil((double) sentence.getBytes().length / dataLength);
@@ -113,12 +114,12 @@ public class NcGuiClientPanelController implements Runnable {
         //    System.out.println("packet count " + packetCount);
             System.arraycopy(name, 0, tempData, 0, name.length);
             System.arraycopy(data, (dataLength * packetNum), tempData, name.length, ((sentenceLength > dataLength) ? dataLength : sentenceLength));
-            System.out.println("\n data length " + ((sentenceLength > dataLength) ? dataLength : sentenceLength));
+      //      System.out.println("\n data length " + ((sentenceLength > dataLength) ? dataLength : sentenceLength));
 
         //    System.out.println("data " + data + " dataLength * packetNum " + dataLength * packetNum + ", tempData" + tempData + ", ((sentenceLength > dataLength) ? dataLength : sentenceLength)" + ((sentenceLength > dataLength) ? dataLength : sentenceLength));
             packetList.add(new OutgoingPacket(packetCount, packetNum, packetSize, ((sentenceLength > dataLength) ? dataLength : sentenceLength), type, name.length, tempData));
             packetNum++;
-            System.out.println("\n" + sentenceLength + " "  + dataLength);
+      //      System.out.println("\n" + sentenceLength + " "  + dataLength);
             sentenceLength -= dataLength;
            // System.out.println("\n" + sentenceLength + " "  + dataLength);
         }

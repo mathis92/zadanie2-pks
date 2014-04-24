@@ -30,7 +30,7 @@ public void stopThread() {
             String name = guiPanel.getNameField().getText();
             Integer textLength = text.getBytes().length;
             Integer nameLength = name.getBytes().length;
-            fragmentCount = (int) Math.ceil(((double)(textLength) / ((Integer.parseInt((String) guiPanel.getPacketSize().getSelectedItem())) - (21+nameLength))));
+            fragmentCount = (int) Math.ceil((double)(textLength) / (Integer)guiPanel.getPacketSize().getValue());
             guiPanel.getFragmentCount().setText(fragmentCount.toString());
         }
     }

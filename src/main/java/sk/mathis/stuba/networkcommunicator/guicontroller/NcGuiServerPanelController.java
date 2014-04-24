@@ -16,6 +16,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import sk.mathis.stuba.equip.IncommingCommunication;
 import sk.mathis.stuba.equip.IncommingPacket;
+import sk.mathis.stuba.equip.LogFiller;
 import sk.mathis.stuba.networkcommunicator.NcGuiServerPanel;
 
 /**
@@ -28,55 +29,71 @@ public class NcGuiServerPanelController implements Runnable {
     boolean running = true;
     private DatagramSocket serverSocket;
     private ArrayList<IncommingCommunication> communications = null;
+    private LogFiller lf;
 
     public NcGuiServerPanelController(NcGuiServerPanel guiPanel) {
         this.guiPanel = guiPanel;
-
+        lf = new LogFiller(guiPanel);
     }
 
-    public void stopThread() {
+    public void stopThread() throws SocketException {
         running = false;
+        //  this.serverSocket.setSoTimeout(200);
         this.serverSocket.close();
     }
 
     @Override
     public void run() {
-        while (running) {
-            try {
-                this.serverSocket = new DatagramSocket(Integer.parseInt(guiPanel.getGui().getCommunicationPort().getText()));
-                while (running) {     
-                    byte[] receiveData = new byte[1024];
-                    DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-                    serverSocket.receive(receivePacket);
-                    guiPanel.getGui().getLogArea().append("prijimam packet z " + receivePacket.getAddress().getHostAddress() + "\n");
-                    savePacket(receiveData, receivePacket.getAddress().getHostAddress());
-                    transferCompleted();
-                }
-            } catch (SocketException ex) {
-                Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
-           //     System.out.println(ex.getMessage());
-            } catch (IOException ex) {
-                Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
+        // while (running) {
+        try {
+            this.serverSocket = new DatagramSocket(Integer.parseInt(guiPanel.getGui().getCommunicationPort().getText()));
+            while (running) {
+                byte[] receiveData = new byte[1024];
+                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+
+                serverSocket.receive(receivePacket);
+                //  guiPanel.getGui().getLogArea().append("prijimam packet z " + receivePacket.getAddress().getHostAddress() + "\n");
+                storePacket(receiveData, receivePacket.getAddress().getHostAddress());
+                transferCompleted();
+
             }
+
+        } catch (SocketException ex) {
+            Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
+            //     System.out.println(ex.getMessage());
+        } catch (IOException ex) {
+            Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        //  }
     }
 
     public void printSentence(String sentence) {
-        guiPanel.getCommunicationArea().append(sentence + "\n");
+        guiPanel.getCommunicationArea().append(sentence);
     }
 
     public void transferCompleted() {
         int i = 0;
         for (IncommingCommunication incComm : communications) {
-        //    System.out.println("som v transferi " + incComm.getState());
+            //    System.out.println("som v transferi " + incComm.getState());
             if (incComm.getState().equals(1)) {
                 Collections.sort(incComm.getIncPacketList());
-               printSentence(createSentence(incComm.getIncPacketList()));
+                incComm.setReceivedPacketCount();
+                printSentence(createSentence(incComm.getIncPacketList()));
+                guiPanel.getCommunicationArea().append("\nreceived " + incComm.getReceivedPacketCount() + "/" + incComm.getIncPacketList().get(0).getPacketCount() + " fragments ");
+                if (incComm.getReceivedPacketCount().equals(incComm.getIncPacketList().get(0).getPacketCount())) {
+                    guiPanel.getCommunicationArea().append("Complete \n");
+                } else {
+                    guiPanel.getCommunicationArea().append("Incomplete \n");
+                }
+                incComm.getIncPacketList().clear();
+                incComm.setIncPacketList(null);
                 communications.remove(i);
+                guiPanel.getGui().getLogArea().append("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n");
                 break;
             }
             i++;
         }
+
     }
 
     public String createSentence(ArrayList<IncommingPacket> incPackets) {
@@ -95,22 +112,23 @@ public class NcGuiServerPanelController implements Runnable {
                 Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
-        sentence.append("\n\t").append("Fragment count : \t").append(incPackets.get(0).getPacketCount()).append("\n");
-        incPackets.clear();
-        incPackets = null;
-      //  System.out.println(sentence.toString());
+
+        sentence.append("\n\t").append("Fragment count : \t").append(incPackets.get(0).getPacketCount());
+
+        //  System.out.println(sentence.toString());
         return sentence.toString();
     }
 
-    public void savePacket(byte[] receivedData, String sourceIpAddress) {
-        IncommingPacket incPacket = new IncommingPacket(receivedData);
+    public void storePacket(byte[] receivedData, String sourceIpAddress) {
+        IncommingPacket incPacket = new IncommingPacket(receivedData, sourceIpAddress);
+        lf.fillInLog(incPacket);
         if (communications == null) {
             communications = new ArrayList<>();
             IncommingCommunication incComm = new IncommingCommunication(sourceIpAddress, incPacket);
             communications.add(incComm);
             if (incPacket.getType().equals(1)) {
                 incComm.setState(1);
+
             } else if (incPacket.getType().equals(0)) {
                 incComm.setState(0);
             } else {

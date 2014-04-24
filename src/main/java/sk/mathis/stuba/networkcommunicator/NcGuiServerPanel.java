@@ -6,6 +6,7 @@
 package sk.mathis.stuba.networkcommunicator;
 
 import javax.swing.JTextArea;
+import javax.swing.text.DefaultCaret;
 
 /**
  *
@@ -18,6 +19,8 @@ public class NcGuiServerPanel extends javax.swing.JPanel {
     public NcGuiServerPanel(NcGui gui) {
         this.gui = gui;
         initComponents();
+        DefaultCaret caret = (DefaultCaret) communicationArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
 
     /**

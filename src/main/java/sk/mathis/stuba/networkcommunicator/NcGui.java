@@ -3,6 +3,7 @@ package sk.mathis.stuba.networkcommunicator;
 import com.jtattoo.plaf.aero.AeroLookAndFeel;
 import com.jtattoo.plaf.hifi.HiFiLookAndFeel;
 import com.jtattoo.plaf.noire.NoireLookAndFeel;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
@@ -14,6 +15,7 @@ import javax.swing.JTextArea;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import javax.swing.text.DefaultCaret;
 import sk.mathis.stuba.equip.DataHelpers;
 import sk.mathis.stuba.networkcommunicator.guicontroller.NcGuiController;
 
@@ -39,6 +41,8 @@ public class NcGui extends javax.swing.JFrame {
         updateComboBoxes();
         myIpAddress.setText(DataHelpers.getMyIpAddress());
         this.setTitle("Network Communicator");
+        DefaultCaret caret = (DefaultCaret) logArea.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
     }
 
@@ -237,7 +241,7 @@ public class NcGui extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "You have to fill Communication port!", "Notification !!!!", JOptionPane.WARNING_MESSAGE);
             } else {
                 server = new NcGuiServerPanel(this);
-                jTabbedPane1.addTab("Server", server);
+                jTabbedPane1.addTab("Listener", server);
                 controller.start();
                 stopButton.setEnabled(true);
                 startButton.setEnabled(false);
@@ -252,7 +256,7 @@ public class NcGui extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "You have to fill Communication port!", "Notification !!!!", JOptionPane.WARNING_MESSAGE);
             } else {
                 client = new NcGuiClientPanel(this);
-                jTabbedPane1.addTab("Client", client);
+                jTabbedPane1.addTab("Sender", client);
                 controller.start();
                 stopButton.setEnabled(true);
                 startButton.setEnabled(false);
@@ -286,7 +290,11 @@ public class NcGui extends javax.swing.JFrame {
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
         if (interfaceType.getSelectedIndex() == 0) {
             if (server != null) {
-                controller.getServerController().stopThread();
+                try {
+                    controller.getServerController().stopThread();
+                } catch (SocketException ex) {
+                    Logger.getLogger(NcGui.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 controller.setServerController(null);
 
                 server = null;
@@ -358,7 +366,7 @@ public class NcGui extends javax.swing.JFrame {
     }
 
     public void fillComboBoxes() {
-        interfaceType.setModel(new DefaultComboBoxModel(new String[]{"Server", "Client"}));
+        interfaceType.setModel(new DefaultComboBoxModel(new String[]{"Listener", "Sender"}));
     }
 
     public void updateComboBoxes() {

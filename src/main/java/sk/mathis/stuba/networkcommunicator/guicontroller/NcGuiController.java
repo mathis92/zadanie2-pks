@@ -23,11 +23,11 @@ public class NcGuiController {
 
     public void start() {
         if (gui.getClient() != null) {
-            System.out.println("client");
+            //System.out.println("client");
             clientController = new NcGuiClientPanelController(gui.getClient());
             new Thread(clientController).start();
         } else if (gui.getServer() != null) {
-            System.out.println("server");
+           // System.out.println("server");
             serverController = new NcGuiServerPanelController(gui.getServer());
             new Thread(serverController).start();
 
