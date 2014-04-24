@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package sk.mathis.stuba.equip;
 
 import com.sun.accessibility.internal.resources.accessibility;
@@ -14,14 +13,16 @@ import java.util.ArrayList;
  * @author Mathis
  */
 public class IncommingCommunication {
+
     private ArrayList<IncommingPacket> incPacketList;
-    private final String ipAddress; 
+    private final String ipAddress;
     private Integer state;
+
     public IncommingCommunication(String IpAddress, IncommingPacket incPacket) {
         this.ipAddress = IpAddress;
         incPacketList = new ArrayList<>();
         incPacketList.add(incPacket);
-        
+
     }
 
     public String getIpAddress() {
@@ -39,5 +40,5 @@ public class IncommingCommunication {
     public Integer getState() {
         return state;
     }
-    
+
 }

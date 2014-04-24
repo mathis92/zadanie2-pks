@@ -33,13 +33,13 @@ public class OutgoingPacket {
     }
 
     private void formOutgoingPacket() {
-        System.out.println(" packetCount " + packetCount + " packetNum " + packetNum + " packetSize " + packetSize);
+    //    System.out.println(" packetCount " + packetCount + " packetNum " + packetNum + " packetSize " + packetSize);
         System.arraycopy(DataHelpers.intToByte(packetCount), 0, outgoingPacket, 0, 4);
         System.arraycopy(DataHelpers.intToByte(packetNum), 0, outgoingPacket, 4, 4);
         System.arraycopy(DataHelpers.intToByte(packetSize), 0, outgoingPacket, 8, 4);
         System.arraycopy(DataHelpers.intToByte(sentenceLength), 0, outgoingPacket, 12, 4);
         System.arraycopy(type, 0, outgoingPacket, 16, 1);
-        System.out.println("type out " + type[0]);
+     //   System.out.println("type out " + type[0]);
         System.arraycopy(DataHelpers.intToByte(nameLength), 0, outgoingPacket, 17, 4);
         System.arraycopy(data, 0, outgoingPacket, (21), sentenceLength + nameLength);
 
@@ -47,6 +47,34 @@ public class OutgoingPacket {
 
     public byte[] getOutgoingPacket() {
         return outgoingPacket;
+    }
+
+    public byte[] getType() {
+        return type;
+    }
+
+    public Integer getSentenceLength() {
+        return sentenceLength;
+    }
+
+    public Integer getPacketSize() {
+        return packetSize;
+    }
+
+    public Integer getPacketNum() {
+        return packetNum;
+    }
+
+    public Integer getPacketCount() {
+        return packetCount;
+    }
+
+    public Integer getNameLength() {
+        return nameLength;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 
 }

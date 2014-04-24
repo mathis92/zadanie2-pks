@@ -9,13 +9,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sk.mathis.stuba.equip.DataHelpers;
 import sk.mathis.stuba.equip.IncommingCommunication;
 import sk.mathis.stuba.equip.IncommingPacket;
 import sk.mathis.stuba.networkcommunicator.NcGuiServerPanel;
@@ -27,38 +25,38 @@ import sk.mathis.stuba.networkcommunicator.NcGuiServerPanel;
 public class NcGuiServerPanelController implements Runnable {
 
     NcGuiServerPanel guiPanel;
+    boolean running = true;
+    private DatagramSocket serverSocket;
     private ArrayList<IncommingCommunication> communications = null;
-    
+
     public NcGuiServerPanelController(NcGuiServerPanel guiPanel) {
         this.guiPanel = guiPanel;
 
     }
 
+    public void stopThread() {
+        running = false;
+        this.serverSocket.close();
+    }
+
     @Override
     public void run() {
-
-        while (true) {
-            DatagramSocket serverSocket = null;
+        while (running) {
             try {
-                serverSocket = new DatagramSocket(9876);
-
-                while (true) {
+                this.serverSocket = new DatagramSocket(Integer.parseInt(guiPanel.getGui().getCommunicationPort().getText()));
+                while (running) {     
                     byte[] receiveData = new byte[1024];
                     DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
                     serverSocket.receive(receivePacket);
                     guiPanel.getGui().getLogArea().append("prijimam packet z " + receivePacket.getAddress().getHostAddress() + "\n");
-
                     savePacket(receiveData, receivePacket.getAddress().getHostAddress());
                     transferCompleted();
-
                 }
             } catch (SocketException ex) {
                 Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println(ex.getMessage());
+           //     System.out.println(ex.getMessage());
             } catch (IOException ex) {
                 Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
-            } finally {
-                serverSocket.close();
             }
         }
     }
@@ -70,10 +68,10 @@ public class NcGuiServerPanelController implements Runnable {
     public void transferCompleted() {
         int i = 0;
         for (IncommingCommunication incComm : communications) {
-            System.out.println("som v transferi " + incComm.getState());
+        //    System.out.println("som v transferi " + incComm.getState());
             if (incComm.getState().equals(1)) {
                 Collections.sort(incComm.getIncPacketList());
-                printSentence(createSentence(incComm.getIncPacketList()));
+               printSentence(createSentence(incComm.getIncPacketList()));
                 communications.remove(i);
                 break;
             }
@@ -81,15 +79,15 @@ public class NcGuiServerPanelController implements Runnable {
         }
     }
 
-    public String createSentence(ArrayList<IncommingPacket> incPacket) {
+    public String createSentence(ArrayList<IncommingPacket> incPackets) {
         StringBuilder sentence = new StringBuilder();
         try {
             sentence.append("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - \n");
-            sentence.append((new String(incPacket.get(0).getName(),"UTF-8") + " : \n"));
+            sentence.append((new String(incPackets.get(0).getName(), "UTF-8") + " : \n"));
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        for (IncommingPacket temp : incPacket) {
+        for (IncommingPacket temp : incPackets) {
             try {
                 String decoded = new String(temp.getData(), "UTF-8");
                 sentence.append(decoded);
@@ -97,9 +95,11 @@ public class NcGuiServerPanelController implements Runnable {
                 Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        incPacket.clear();
-        incPacket = null;
-        System.out.println(sentence.toString());
+        
+        sentence.append("\n\t").append("Fragment count : \t").append(incPackets.get(0).getPacketCount()).append("\n");
+        incPackets.clear();
+        incPackets = null;
+      //  System.out.println(sentence.toString());
         return sentence.toString();
     }
 

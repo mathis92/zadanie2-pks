@@ -14,19 +14,29 @@ import sk.mathis.stuba.networkcommunicator.NcGuiClientPanel;
 public class FragmentCounter implements Runnable {
 
     NcGuiClientPanel guiPanel;
+    boolean running = true;
+    Integer fragmentCount;
 
     public FragmentCounter(NcGuiClientPanel guiPanel) {
         this.guiPanel = guiPanel;
     }
-
+public void stopThread() {
+        running = false;
+    }
     @Override
     public void run() {
-        while (true) {
+        while (running) {
             String text = guiPanel.getSendTextField().getText();
+            String name = guiPanel.getNameField().getText();
             Integer textLength = text.getBytes().length;
-            Integer fragmentCount = (int) Math.ceil(((double)textLength / ((Integer.parseInt((String) guiPanel.getPacketSize().getSelectedItem())) - 17)));
+            Integer nameLength = name.getBytes().length;
+            fragmentCount = (int) Math.ceil(((double)(textLength) / ((Integer.parseInt((String) guiPanel.getPacketSize().getSelectedItem())) - (21+nameLength))));
             guiPanel.getFragmentCount().setText(fragmentCount.toString());
         }
+    }
+
+    public Integer getFragmentCount() {
+        return fragmentCount;
     }
 
 }

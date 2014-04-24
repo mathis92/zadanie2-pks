@@ -36,6 +36,7 @@ public class NcGuiServerPanel extends javax.swing.JPanel {
         setMinimumSize(new java.awt.Dimension(380, 401));
         setPreferredSize(new java.awt.Dimension(380, 401));
 
+        communicationArea.setEditable(false);
         communicationArea.setColumns(20);
         communicationArea.setLineWrap(true);
         communicationArea.setRows(5);

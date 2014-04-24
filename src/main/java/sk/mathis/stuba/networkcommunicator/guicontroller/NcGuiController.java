@@ -33,4 +33,22 @@ public class NcGuiController {
 
         }
     }
+
+    public NcGuiClientPanelController getClientController() {
+        return clientController;
+    }
+
+    public NcGuiServerPanelController getServerController() {
+        return serverController;
+    }
+
+    public void setClientController(NcGuiClientPanelController clientController) {
+        this.clientController = clientController;
+    }
+
+    public void setServerController(NcGuiServerPanelController serverController) {
+        this.serverController = serverController;
+    }
+    
+    
 }

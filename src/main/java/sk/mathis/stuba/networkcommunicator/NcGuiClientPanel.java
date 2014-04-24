@@ -23,7 +23,7 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
     public NcGuiClientPanel(NcGui gui) {
         this.gui = gui;
         initComponents();
-        packetSize.setModel(new DefaultComboBoxModel(new String[]{"32","64", "128","256","512"}));
+        packetSize.setModel(new DefaultComboBoxModel(new String[]{"32", "64", "128", "256", "512"}));
         packetSize.setSelectedIndex(0);
     }
 
@@ -52,12 +52,13 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
         setName(""); // NOI18N
         setPreferredSize(new java.awt.Dimension(360, 390));
 
+        communicationArea.setEditable(false);
         communicationArea.setColumns(20);
         communicationArea.setLineWrap(true);
         communicationArea.setRows(5);
         jScrollPane1.setViewportView(communicationArea);
 
-        sendTextField.setText("jFormattedTextField1");
+        sendTextField.setText("fill text to be sent ");
 
         packetSize.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
 
@@ -69,10 +70,14 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
 
         fragmentCount.setText("jLabel3");
 
-        nameField.setText("jFormattedTextField1");
         nameField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 nameFieldActionPerformed(evt);
+            }
+        });
+        nameField.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                nameFieldKeyPressed(evt);
             }
         });
 
@@ -133,6 +138,13 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_nameFieldActionPerformed
 
+    private void nameFieldKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_nameFieldKeyPressed
+        if (nameField.getText().length() >= 10) {
+            nameField.setText(nameField.getText().substring(0, 9));
+        }
+
+    }//GEN-LAST:event_nameFieldKeyPressed
+
     public JFormattedTextField getSendTextField() {
         return sendTextField;
     }
@@ -160,7 +172,6 @@ public class NcGuiClientPanel extends javax.swing.JPanel {
     public JLabel getFragmentCount() {
         return fragmentCount;
     }
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea communicationArea;

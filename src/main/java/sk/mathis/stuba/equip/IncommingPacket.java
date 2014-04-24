@@ -54,13 +54,14 @@ public class IncommingPacket implements Comparable<IncommingPacket>{
         nameLength = DataHelpers.toInt(nameLengthByte);
         name = new byte[nameLength];
         System.arraycopy(receivedData, 21, name, 0, nameLength);
-         try {
+      /*   try {
              System.out.println(new String(name,"UTF-8"));
          } catch (UnsupportedEncodingException ex) {
              Logger.getLogger(IncommingPacket.class.getName()).log(Level.SEVERE, null, ex);
-         }
-        data = new byte[packetSize - (21+nameLength) ];
+         }*/
+        data = new byte[dataLength];
         System.arraycopy(receivedData,(21+nameLength) , data, 0, dataLength);
+     //   System.out.println(dataLength + "dataLENGTH");
    }    
 
     public byte[] getData() {
