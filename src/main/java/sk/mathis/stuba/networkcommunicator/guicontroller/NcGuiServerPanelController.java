@@ -10,6 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.logging.Level;
@@ -27,7 +28,7 @@ public class NcGuiServerPanelController implements Runnable {
 
     NcGuiServerPanel guiPanel;
     boolean running = true;
-    private DatagramSocket serverSocket;
+    private DatagramSocket serverSocket = null;
     private ArrayList<IncommingCommunication> communications = null;
     private LogFiller lf;
 
@@ -39,23 +40,29 @@ public class NcGuiServerPanelController implements Runnable {
     public void stopThread() throws SocketException {
         running = false;
         //  this.serverSocket.setSoTimeout(200);
-        this.serverSocket.close();
+
     }
 
     @Override
     public void run() {
         // while (running) {
+
         try {
             this.serverSocket = new DatagramSocket(Integer.parseInt(guiPanel.getGui().getCommunicationPort().getText()));
+            this.serverSocket.setSoTimeout(200);
             while (running) {
-                byte[] receiveData = new byte[1024];
-                DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
+                try {
+                    byte[] receiveData = new byte[1024];
+                    DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 
-                serverSocket.receive(receivePacket);
-                //  guiPanel.getGui().getLogArea().append("prijimam packet z " + receivePacket.getAddress().getHostAddress() + "\n");
-                storePacket(receiveData, receivePacket.getAddress().getHostAddress());
-                transferCompleted();
+                    serverSocket.receive(receivePacket);
+                    //  guiPanel.getGui().getLogArea().append("prijimam packet z " + receivePacket.getAddress().getHostAddress() + "\n");
+                    storePacket(receiveData, receivePacket.getAddress().getHostAddress());
+                    transferCompleted();
 
+                } catch (SocketTimeoutException ex) {
+
+                }
             }
 
         } catch (SocketException ex) {
@@ -63,6 +70,10 @@ public class NcGuiServerPanelController implements Runnable {
             //     System.out.println(ex.getMessage());
         } catch (IOException ex) {
             Logger.getLogger(NcGuiServerPanelController.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            if (this.serverSocket != null && this.serverSocket.isBound()) {
+                this.serverSocket.close();
+            }
         }
         //  }
     }

@@ -305,6 +305,7 @@ public class NcGui extends javax.swing.JFrame {
                 interfaceType.setEnabled(true);
                 communicationPort.setEnabled(true);
                 destinationIpAddress.setEnabled(false);
+                logArea.setText(null);
             }
         }
         if (interfaceType.getSelectedIndex() == 1) {
@@ -320,6 +321,7 @@ public class NcGui extends javax.swing.JFrame {
                 interfaceType.setEnabled(true);
                 communicationPort.setEnabled(true);
                 destinationIpAddress.setEnabled(false);
+                logArea.setText(null);
             }
         }
 
